@@ -4,6 +4,7 @@ MAIA project codebase.
 Runs on ROS Noetic and Ubuntu 22.04
 
 ## This repo is a ROS workspace
+Create the base workspace folder and clone this repo into it.
 ```
 cd
 mkdir maia_ws
@@ -31,7 +32,7 @@ sudo make install
 ```
 
 ## Build MAIA
-To build MAIA:
+Now you can build MAIA:
 ```
 cd maia_ws
 catkin build
