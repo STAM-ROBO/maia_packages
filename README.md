@@ -3,11 +3,11 @@ MAIA project codebase.
 
 Runs on ROS Noetic and Ubuntu 22.04
 
-## Get MAIA
+## Clone this repo in the src folder of your ROS workspace
 ```
-git clone https://github.com/STAM-ROBO/maia_packages
+cd maia_ws
+git clone https://github.com/STAM-ROBO/maia_packages src
 ```
-
 
 ## Dependencies
 You need to install these pkgs before building MAIA
@@ -33,7 +33,7 @@ sudo make install
 To build MAIA:
 ```
 cd maia_ws
-catkin_make
+catkin build
 ```
 
 ## Launching the camera node
