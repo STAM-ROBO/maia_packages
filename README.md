@@ -1,10 +1,11 @@
 # maia_ws
-MAIA project codebase
+MAIA project codebase.
+
+Runs on ROS Noetic and Ubuntu 22.04
 
 ## Get MAIA
-
 ```
-git clone https://github.com/STAM-ROBO/maia_ws
+git clone https://github.com/STAM-ROBO/maia_packages
 ```
 
 
@@ -14,7 +15,7 @@ You need to install these pkgs before building MAIA
 sudo apt-get install ros-$ROS_DISTRO-realsense2-camera
 sudo apt-get install libsdl-image1.2-dev
 sudo apt-get install libsdl-dev
-sudo apt-get install ros-kinetic-tf2-sensor-msgs
+sudo apt-get install ros-noetic-tf2-sensor-msgs
 ```
 
 The YDlidar-SDK is needed and may be installed in any folder.
