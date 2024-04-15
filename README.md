@@ -1,9 +1,9 @@
-# maia_ws
+# MAIA packages
 MAIA project codebase.
 
 Runs on ROS Noetic and Ubuntu 22.04
 
-## Clone this repo is a ROS workspace
+## This repo is a ROS workspace
 ```
 cd
 mkdir maia_ws
