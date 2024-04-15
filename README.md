@@ -41,7 +41,7 @@ catkin build
 ## Launching the camera node
 To start the camera node, run the follwing command:
 ```
-roslaunch realsense2_camera rs_camera.launch
+roslaunch realsense2_camera rs_camera.launch align_depth:=true
 ```
 This node publishes several topics obtained from the live-stream of the camera (besides others including the calibration parameters), to which we need to subscribe in other modules.
 
