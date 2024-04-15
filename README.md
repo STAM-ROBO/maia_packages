@@ -48,3 +48,5 @@ This node publishes several topics obtained from the live-stream of the camera (
 ### Object Detection Module
 This module is responsible for detecting objects from the camera feed, and perform 3D localization (using camera intrinsics and depth maps).
 The detection is performed in 2D using a COCO-trained detector. the system currently provides wrappers for Faster R-CNN and YOLOv7, as two examples for heavy-weight and a ligher detector. Faster R-CNN is used directly from torchvision, while YOLOv7 is cloned from the official reposistory (published in CVPR2023)
+
+For installation: download and install pytorch (with cuda support) and see requirements.txt for other dependencies
