@@ -1,0 +1,9 @@
+setup.py
+src/mobile_net_backend/__init__.py
+src/mobile_net_backend/mobilenet_detector.py
+src/object_detector.egg-info/PKG-INFO
+src/object_detector.egg-info/SOURCES.txt
+src/object_detector.egg-info/dependency_links.txt
+src/object_detector.egg-info/top_level.txt
+src/yolov7_backend/__init__.py
+src/yolov7_backend/yolov7_detector.py
