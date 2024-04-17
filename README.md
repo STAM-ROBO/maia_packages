@@ -38,6 +38,23 @@ cd maia_ws
 catkin build
 ```
 
+## Configure the ROS environment to support remote connection
+We don't want the default localhost configuration.
+
+On the navigation PC (192.168.100.80):
+```
+#tell ROS that the IP address to which the connections are bound
+export ROS_IP=192.168.100.80
+export ROS_MASTER_URI=http://192.168.100.80:11311
+```
+
+On the control PC (192.168.100.150):
+```
+#tell ROS that the IP address to which the connections are bound
+export ROS_IP=192.168.100.150
+export ROS_MASTER_URI=http://192.168.100.80:11311
+```
+
 ## Launching the camera node
 To start the camera node, run the following command:
 ```
