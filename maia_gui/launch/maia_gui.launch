@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="maia_gui" name="myviz" type="maia_qt_hmi.py"/>
+
+</launch>
