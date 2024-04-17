@@ -17,6 +17,7 @@ from mobile_net_backend.mobilenet_detector import MBNet_Detector
 from yolov7_backend.yolov7_detector import YOLO7_Detector
 import message_filters
 from cv_bridge import CvBridge, CvBridgeError
+from object_detector.msg import Detections_3d,Object_3d
 class Detector:
     def __init__(self):
         import sys
@@ -28,7 +29,16 @@ class Detector:
 
         ts = message_filters.TimeSynchronizer([image_sub,depth_sub,info], 5)
         ts.registerCallback(self.callback)
-    
+        self.pub = rospy.Publisher('detections_3d', Detections_3d, queue_size=10)
+        self.names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 
+         'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 
+         'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 
+         'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 
+         'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 
+         'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 
+         'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 
+         'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 
+         'hair drier', 'toothbrush']
     def callback(self,rgb,depth,info):
         
         image_numpy = np.array(list(rgb.data),np.uint8)
@@ -48,7 +58,11 @@ class Detector:
         #print(k)
         image_numpy = image_numpy.reshape((720,1280,3))
         image_numpy = cv2.cvtColor(image_numpy,cv2.COLOR_RGB2BGR)
-        boxes,labels = self.detector.detect(image_numpy)
+        boxes,labels,scores = self.detector.detect(image_numpy)
+        msg = Detections_3d()
+        msg.header =  std_msgs.msg.Header()
+        msg.header.stamp = rospy.Time.now()
+        objs = []
         for box,label in zip(boxes,labels):
             xmin,ymin,xmax,ymax =[int(b) for b in box]
             cv2.rectangle(image_numpy,(xmin,ymin),(xmax,ymax),[255,255,0],2)
@@ -57,9 +71,16 @@ class Detector:
             z = depth_img[center_y,center_x]
             point2d_z = np.array([center_x*z,center_y*z,z])
             point_3d = np.dot(inv_k,point2d_z)
-            print(point_3d)
+            
             cv2.putText(image_numpy, '%.2fm'%(point_3d[2]),(xmin+20,ymin+20),cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
-
+            obj = Object_3d()
+            obj.pos_x = point3d[0]
+            obj.pos_y = point3d[1]
+            obj.pos_z = point3d[2]
+            obj.obj_class = self.names[label]
+            objs.append(obj)
+        msg.objects = objs
+        self.pub.publish(msg)
         cv2.namedWindow('feed', cv2.WINDOW_AUTOSIZE)
         cv2.imshow('feed', image_numpy)
         cv2.waitKey(1)
