@@ -45,6 +45,8 @@
 		<param name="port" value="/dev/ttyACM0"/>
 		<param name="baud" value="115200"/>
 	</node>
+	
+	<!--node pkg="perturbator" type="perturbator" name="perturbator"/-->
 
 	<node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
 		<!-- Frame names -->
@@ -75,7 +77,7 @@
 		<param name="laser_z_min_value" value = "-1.0" />
 		<param name="laser_z_max_value" value = "1.0" />
 		<param name="map_pub_period " value = "1.0" />
-		<param name="laser_min_dist  " value = "0.5" />
+		<param name="laser_min_dist  " value = "1.0" />
 		<param name="laser_max_dist  " value = "12.0" />
 
 		<!-- Advertising config -->
@@ -83,6 +85,13 @@
 		<param name="scan_subscriber_queue_size" value="1"/>
 		<param name="scan_topic" value="scan"/>
 	</node>
+	
+	<!--node pkg="hector_trajectory_server" type="hector_trajectory_server" name="hector_trajectory_server" output="screen">
+		<param name="target_frame_name" value = "map" />
+		<param name="source_frame_name" value = "base_link" />
+		<param name="trajectory_update_rate " type="double" value = "2.0" />
+		<param name="trajectory_publish_rate  " type="double" value = "1" />
+	</node-->
 	  
 
 	<!--include file="$(find hector_geotiff_launch)/launch/geotiff_mapper.launch">
