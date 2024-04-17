@@ -16,4 +16,5 @@ class MBNet_Detector:
         prediction = self.model(batch)[0]
         labels = [self.weights.meta["categories"][i] for i in prediction["labels"]]
         boxes = prediction["boxes"].detach().cpu().numpy()
+        scores = prediction["scores"].detach().cpu().numpy()
         return boxes,labels
