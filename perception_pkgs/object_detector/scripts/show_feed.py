@@ -20,6 +20,7 @@ import message_filters
 from cv_bridge import CvBridge, CvBridgeError
 from object_detector.msg import Detections_3d,Object_3d
 import std_msgs
+import time
 class Detector:
     def __init__(self):
         import sys
@@ -29,8 +30,8 @@ class Detector:
         depth_sub = message_filters.Subscriber('/camera/aligned_depth_to_color/image_raw', Image)
         info = message_filters.Subscriber('/camera/color/camera_info', CameraInfo)
 
-        ts = message_filters.TimeSynchronizer([image_sub,depth_sub,info],100)
-        ts.registerCallback(self.callback)
+        ts = message_filters.TimeSynchronizer([image_sub,depth_sub,info],10)
+        
         self.pub = rospy.Publisher('detections_3d', Detections_3d, queue_size=180)
         self.names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 
          'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 
@@ -41,18 +42,18 @@ class Detector:
          'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 
          'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 
          'hair drier', 'toothbrush']
+        self.detector.warm_up()
+        self.realsense_depth_scale = 0.001
+        ts.registerCallback(self.callback)
     def callback(self,rgb,depth,info):
         
-        image_numpy = np.array(list(rgb.data),np.uint8)
-        
-        realsense_depth_scale = 0.001
-        depth_img = np.frombuffer(depth.data, dtype=np.uint16).reshape((720,1280))*realsense_depth_scale
+        image_numpy = np.frombuffer(rgb.data,np.uint8)
+        depth_img = np.frombuffer(depth.data, dtype=np.uint16).reshape((720,1280))*self.realsense_depth_scale
+        image_numpy = image_numpy.reshape((720,1280,3))
+        image_numpy = cv2.cvtColor(image_numpy,cv2.COLOR_RGB2BGR)
         
         k = np.array(list(info.K)).reshape(3,3)
         inv_k = np.linalg.pinv(k)
-        
-        image_numpy = image_numpy.reshape((720,1280,3))
-        image_numpy = cv2.cvtColor(image_numpy,cv2.COLOR_RGB2BGR)
         
         boxes,labels,scores = self.detector.detect(image_numpy)
         
@@ -81,6 +82,7 @@ class Detector:
             objs.append(obj)
         msg.objects = objs
         self.pub.publish(msg)
+        
         cv2.namedWindow('feed', cv2.WINDOW_AUTOSIZE)
         cv2.imshow('feed', image_numpy)
         cv2.waitKey(1)

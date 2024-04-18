@@ -22,7 +22,7 @@ class YOLO7_TRT:
     def __init__(self):
         print(torch.cuda.is_available())
         self.device = torch.device('cuda')
-        model_weights = '/home/administrator/ITTSorting/src/object_detector/src/yolov7_backend/yolov7-nms.trt'
+        model_weights = '/home/administrator/maia_ws/src/perception_pkgs/object_detector/src/yolov7_backend/yolo-nms.trt'
         Binding = namedtuple('Binding', ('name', 'dtype', 'shape', 'data', 'ptr'))
         logger = trt.Logger(trt.Logger.ERROR)
         trt.init_libnvinfer_plugins(logger, namespace="")
@@ -37,6 +37,11 @@ class YOLO7_TRT:
             self.bindings[name] = Binding(name, dtype, shape, data, int(data.data_ptr()))
         self.binding_addrs = OrderedDict((n, d.ptr) for n, d in self.bindings.items())
         self.context = model.create_execution_context()
+    def warm_up(self):
+        for _ in range(60):
+            tmp = torch.randn(1,3,640,640).to(self.device)
+            self.binding_addrs['images'] = int(tmp.data_ptr())
+            self.context.execute_v2(list(self.binding_addrs.values()))
     def letterbox(self,im, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleup=True, stride=32):
         # Resize and pad image while meeting stride-multiple constraints
         shape = im.shape[:2]  # current shape [height, width]
@@ -84,10 +89,9 @@ class YOLO7_TRT:
 
         self.binding_addrs['images'] = int(im.data_ptr())
         import time
-        start = time.time()
-
+        
         self.context.execute_v2(list(self.binding_addrs.values()))
-        #print('cost is %.5f '%(time.time()-start))
+        
         nums = self.bindings['num_dets'].data
         boxes = self.bindings['det_boxes'].data
         scores = self.bindings['det_scores'].data
@@ -98,4 +102,5 @@ class YOLO7_TRT:
         classes = classes[0,:nums[0][0]].detach().cpu().numpy()
         boxs = [self.postprocess(b,ratio,dwdh).round().int() for b in boxes]
         boxes = [b.detach().cpu().numpy() for b in boxes]
+        
         return boxes,classes,scores
