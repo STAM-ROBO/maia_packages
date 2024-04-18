@@ -117,6 +117,6 @@ class YOLO7_Detector:
         det = non_max_suppression(pred,0.4)[0]
         det[:,:4] = scale_coords(img.shape[2:],det[:,:4],image_numpy.shape).round()
         boxes = np.array([t.cpu().detach().numpy()[0:4].astype(int) for t in det])
-        labels = np.array([class_id_to_string[t.cpu().detach().numpy()[-1].astype(int)+1] for t in det])
-        scores = np.array([class_id_to_string[t.cpu().detach().numpy()[4].astype(int)+1] for t in det])
+        labels = np.array([t.cpu().detach().numpy()[-1].astype(int)+1 for t in det])
+        scores = np.array([t.cpu().detach().numpy()[4].astype(float) for t in det])
         return boxes,labels,scores

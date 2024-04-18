@@ -18,6 +18,7 @@ from yolov7_backend.yolov7_detector import YOLO7_Detector
 import message_filters
 from cv_bridge import CvBridge, CvBridgeError
 from object_detector.msg import Detections_3d,Object_3d
+import std_msgs
 class Detector:
     def __init__(self):
         import sys
@@ -59,11 +60,13 @@ class Detector:
         image_numpy = image_numpy.reshape((720,1280,3))
         image_numpy = cv2.cvtColor(image_numpy,cv2.COLOR_RGB2BGR)
         boxes,labels,scores = self.detector.detect(image_numpy)
+        print(labels,scores)
         msg = Detections_3d()
         msg.header =  std_msgs.msg.Header()
         msg.header.stamp = rospy.Time.now()
         objs = []
         for box,label in zip(boxes,labels):
+            print(label)
             xmin,ymin,xmax,ymax =[int(b) for b in box]
             cv2.rectangle(image_numpy,(xmin,ymin),(xmax,ymax),[255,255,0],2)
             center_x = int((xmin+xmax)/2)
@@ -74,9 +77,9 @@ class Detector:
             
             cv2.putText(image_numpy, '%.2fm'%(point_3d[2]),(xmin+20,ymin+20),cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
             obj = Object_3d()
-            obj.pos_x = point3d[0]
-            obj.pos_y = point3d[1]
-            obj.pos_z = point3d[2]
+            obj.pos_x = point_3d[0]
+            obj.pos_y = point_3d[1]
+            obj.pos_z = point_3d[2]
             obj.obj_class = self.names[label]
             objs.append(obj)
         msg.objects = objs
