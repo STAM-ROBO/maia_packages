@@ -1,2 +1,2 @@
 std_msgs/Header header
-object_3d[] objects
+Object_3d[] objects
