@@ -1,7 +1,7 @@
 # MAIA packages
 MAIA project codebase.
 
-Runs on ROS Noetic and Ubuntu 22.04
+Runs on ROS Noetic and Ubuntu 20.04
 
 ## This repo is a ROS workspace
 Create the base workspace folder and clone this repo into it.
@@ -16,8 +16,7 @@ git clone https://github.com/STAM-ROBO/maia_packages src
 You need to install these pkgs before building MAIA
 ```
 sudo apt-get update
-sudo apt install python3-catkin-tools
-sudo apt-get install -y  ros-noetic-tf2-sensor-msgs ros-noetic-realsense2-camera ros-noetic-angles ros-noetic-laser-geometry libsdl-image1.2-dev libsdl-dev
+sudo apt-get install -y python3-catkin-tools ros-noetic-tf2-sensor-msgs ros-noetic-tf ros-noetic-image-transport ros-noetic-realsense2-camera ros-noetic-angles ros-noetic-laser-geometry libsdl-image1.2-dev libsdl-dev libbullet-dev ros-noetic-tf2-geometry-msgs qt5-default libyaml-cpp-dev
 ```
 
 The YDlidar-SDK is needed and may be installed in any folder.
@@ -48,7 +47,7 @@ export ROS_IP=192.168.100.80
 export ROS_MASTER_URI=http://192.168.100.80:11311
 ```
 
-On the control PC (192.168.100.150):
+On the remote control PC (192.168.100.150):
 ```
 #tell ROS that the IP address to which the connections are bound
 export ROS_IP=192.168.100.150
