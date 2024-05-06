@@ -17,7 +17,7 @@ You need to install these pkgs before building MAIA
 ```
 sudo apt-get update
 sudo apt install python3-catkin-tools
-sudo apt-get install -y ros-$ROS_DISTRO-realsense2-camera libsdl-image1.2-dev libsdl-dev ros-noetic-tf2-sensor-msgs
+sudo apt-get install -y  ros-noetic-tf2-sensor-msgs ros-noetic-realsense2-camera ros-noetic-angles ros-noetic-laser-geometry libsdl-image1.2-dev libsdl-dev
 ```
 
 The YDlidar-SDK is needed and may be installed in any folder.
