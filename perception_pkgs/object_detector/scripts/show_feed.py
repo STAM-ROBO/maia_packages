@@ -15,7 +15,7 @@ from torchvision.transforms.functional import to_pil_image
 
 from mobile_net_backend.mobilenet_detector import MBNet_Detector
 from yolov7_backend.yolov7_detector import YOLO7_Detector
-from yolov7_backend.yolo7_trt import YOLO7_TRT
+#from yolov7_backend.yolo7_trt import YOLO7_TRT
 import message_filters
 from cv_bridge import CvBridge, CvBridgeError
 from object_detector.msg import Detections_3d,Object_3d
@@ -25,7 +25,7 @@ class Detector:
     def __init__(self):
         import sys
         print(sys.executable)
-        self.detector = YOLO7_TRT()
+        self.detector = YOLO7_Detector()
         image_sub = message_filters.Subscriber('/camera/color/image_raw', Image)
         depth_sub = message_filters.Subscriber('/camera/aligned_depth_to_color/image_raw', Image)
         info = message_filters.Subscriber('/camera/color/camera_info', CameraInfo)
