@@ -14,8 +14,8 @@ from torchvision.utils import draw_bounding_boxes
 from torchvision.transforms.functional import to_pil_image
 
 from mobile_net_backend.mobilenet_detector import MBNet_Detector
-from yolov7_backend.yolov7_detector import YOLO7_Detector
-#from yolov7_backend.yolo7_trt import YOLO7_TRT
+#from yolov7_backend.yolov7_detector import YOLO7_Detector
+from yolov7_backend.yolo7_trt import YOLO7_TRT
 import message_filters
 from cv_bridge import CvBridge, CvBridgeError
 from object_detector.msg import Detections_3d,Object_3d
@@ -25,7 +25,7 @@ class Detector:
     def __init__(self):
         import sys
         print(sys.executable)
-        self.detector = YOLO7_Detector()
+        self.detector = YOLO7_TRT()
         image_sub = message_filters.Subscriber('/camera/color/image_raw', Image)
         depth_sub = message_filters.Subscriber('/camera/aligned_depth_to_color/image_raw', Image)
         info = message_filters.Subscriber('/camera/color/camera_info', CameraInfo)
@@ -46,9 +46,11 @@ class Detector:
         self.realsense_depth_scale = 0.001
         ts.registerCallback(self.callback)
     def callback(self,rgb,depth,info):
-        
+        import time
+        start = time.time()
         image_numpy = np.frombuffer(rgb.data,np.uint8)
         depth_img = np.frombuffer(depth.data, dtype=np.uint16).reshape((720,1280))*self.realsense_depth_scale
+        #print('data reading time is %.4f'%(time.time()-start))
         image_numpy = image_numpy.reshape((720,1280,3))
         image_numpy = cv2.cvtColor(image_numpy,cv2.COLOR_RGB2BGR)
         
@@ -56,7 +58,7 @@ class Detector:
         inv_k = np.linalg.pinv(k)
         
         boxes,labels,scores = self.detector.detect(image_numpy)
-        
+        #print('up to detection time %.4f'%(time.time()-start))
         msg = Detections_3d()
         msg.header =  std_msgs.msg.Header()
         msg.header.stamp = rospy.Time.now()
@@ -64,7 +66,7 @@ class Detector:
         for box,label in zip(boxes,labels):
             
             xmin,ymin,xmax,ymax =[int(b) for b in box]
-            cv2.rectangle(image_numpy,(xmin,ymin),(xmax,ymax),[255,255,0],2)
+            #cv2.rectangle(image_numpy,(xmin,ymin),(xmax,ymax),[255,255,0],2)
             center_x = int((xmin+xmax)/2)
             center_y = int((ymin+ymax)/2)
             z = depth_img[center_y,center_x]
@@ -73,7 +75,7 @@ class Detector:
             point2d_z = np.array([center_x*z,center_y*z,z])
             point_3d= np.dot(inv_k,point2d_z)
             
-            cv2.putText(image_numpy, '%.2fm'%(point_3d[2]),(xmin+20,ymin+20),cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
+            #cv2.putText(image_numpy, '%.2fm'%(point_3d[2]),(xmin+20,ymin+20),cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
             obj = Object_3d()
             obj.pos_x = point_3d[0]
             obj.pos_y = point_3d[1]
@@ -82,10 +84,10 @@ class Detector:
             objs.append(obj)
         msg.objects = objs
         self.pub.publish(msg)
-        
-        cv2.namedWindow('feed', cv2.WINDOW_AUTOSIZE)
-        cv2.imshow('feed', image_numpy)
-        cv2.waitKey(1)
+        #print('total time is %.4f'%(time.time()-start))
+        # cv2.namedWindow('feed', cv2.WINDOW_AUTOSIZE)
+        # cv2.imshow('feed', image_numpy)
+        ## cv2.waitKey(1)
 
 
 if __name__ == '__main__':

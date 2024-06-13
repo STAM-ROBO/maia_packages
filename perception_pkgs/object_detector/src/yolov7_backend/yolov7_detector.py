@@ -99,7 +99,7 @@ class YOLO7_Detector:
     def __init__(self):
         print(torch.cuda.is_available())
         self.device = torch.device('cuda')
-        model_weights = attempt_load('/home/maia_ws/src/perception_pkgs/object_detector/src/yolov7_backend/yolov7.pt')
+        model_weights = attempt_load('/home/maia/maia_ws/src/perception_pkgs/object_detector/src/yolov7_backend/yolov7.pt')
         self.model = TracedModel(model_weights,self.device,640)
 
     def detect(self,image_numpy):

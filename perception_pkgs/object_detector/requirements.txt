@@ -1,6 +1,10 @@
-pandas
-opencv-python
-matplotlib
+numpy==1.21
+matplotlib==3.7.0
+pandas==2.0.0
+python-dateutil==2.8.2
+pencv-python
 tqdm
 seaborn
 scipy
+pycuda
+onnx

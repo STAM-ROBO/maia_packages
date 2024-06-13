@@ -1,19 +1,13 @@
 #!/home/administrator/anaconda3/envs/maia_ws/bin python
 import sys
 import os
-
-sys.path.append(os.getcwd()+'/src/perception_pkgs/object_detector/src/yolov7_backend/yolov7')
-print(sys.path)
 import rospy
 from pathlib import Path
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
 import numpy as np
-from models.experimental import attempt_load
-from utils.torch_utils import select_device,load_classifier,time_synchronized,TracedModel
 import torch
-from utils.general import non_max_suppression,scale_coords
 import tensorrt as trt
 from PIL import Image
 from pathlib import Path
@@ -22,7 +16,7 @@ class YOLO7_TRT:
     def __init__(self):
         print(torch.cuda.is_available())
         self.device = torch.device('cuda')
-        model_weights = '/home/administrator/maia_ws/src/perception_pkgs/object_detector/src/yolov7_backend/yolo-nms.trt'
+        model_weights = '/home/maia/maia_ws/src/perception_pkgs/object_detector/src/yolov7_backend/yolov7-jp.trt'
         Binding = namedtuple('Binding', ('name', 'dtype', 'shape', 'data', 'ptr'))
         logger = trt.Logger(trt.Logger.ERROR)
         trt.init_libnvinfer_plugins(logger, namespace="")
@@ -89,7 +83,7 @@ class YOLO7_TRT:
 
         self.binding_addrs['images'] = int(im.data_ptr())
         import time
-        
+        start = time.time()
         self.context.execute_v2(list(self.binding_addrs.values()))
         
         nums = self.bindings['num_dets'].data
