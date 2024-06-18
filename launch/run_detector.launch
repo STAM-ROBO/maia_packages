@@ -1,7 +1,0 @@
-<launch>
-<arg name="align_depth" default="true"/>
-<include file="$(find realsense2_camera)/launch/rs_camera.launch">
-<arg name="align_depth" value="$(arg align_depth)"/>
-</include>
-<node name="detector" pkg="object_detector" type="show_feed.py" output="screen"/>
-</launch>

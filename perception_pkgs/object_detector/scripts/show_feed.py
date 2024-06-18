@@ -13,7 +13,6 @@ from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_
 from torchvision.utils import draw_bounding_boxes
 from torchvision.transforms.functional import to_pil_image
 
-from mobile_net_backend.mobilenet_detector import MBNet_Detector
 #from yolov7_backend.yolov7_detector import YOLO7_Detector
 from yolov7_backend.yolo7_trt import YOLO7_TRT
 import message_filters
@@ -30,8 +29,7 @@ class Detector:
         depth_sub = message_filters.Subscriber('/camera/aligned_depth_to_color/image_raw', Image)
         info = message_filters.Subscriber('/camera/color/camera_info', CameraInfo)
 
-        ts = message_filters.TimeSynchronizer([image_sub,depth_sub,info],10)
-        
+        self.ts = message_filters.TimeSynchronizer([image_sub,depth_sub,info],30)
         self.pub = rospy.Publisher('detections_3d', Detections_3d, queue_size=180)
         self.names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 
          'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 
@@ -44,21 +42,62 @@ class Detector:
          'hair drier', 'toothbrush']
         self.detector.warm_up()
         self.realsense_depth_scale = 0.001
-        ts.registerCallback(self.callback)
-    def callback(self,rgb,depth,info):
-        import time
-        start = time.time()
+        self.img_width = 640
+        self.img_height = 480
+        self.counter =0
+        self.intrinsics_sub = rospy.Subscriber('/camera/color/camera_info',CameraInfo,self.do_initialization)
+        
+    def do_initialization(self,info):
+        self.k = np.array(list(info.K)).reshape(3,3)
+        self.inv_k = np.linalg.pinv(self.k)
+        
+        self.intrinsics_sub.unregister()
+        if(rospy.get_param('~debug')):
+            self.ts.registerCallback(self.callback_debug)    
+            rospy.loginfo('debug mode activated!!!!')
+        else:
+            self.ts.registerCallback(self.callback_operation)
+            rospy.loginfo('debug mode deactivated!!!!')
+    def create_obj3d(self,x,y,z):
+        obj = Object_3d()
+        obj.pos_x = x
+        obj.pos_y = y
+        obj.pos_z = z
+        return obj
+    def callback_operation(self,rgb,depth,info):
+       
         image_numpy = np.frombuffer(rgb.data,np.uint8)
-        depth_img = np.frombuffer(depth.data, dtype=np.uint16).reshape((720,1280))*self.realsense_depth_scale
+        depth_img = np.frombuffer(depth.data, dtype=np.uint16).reshape((self.img_height,self.img_width))*self.realsense_depth_scale
+        
+        image_numpy = image_numpy.reshape((self.img_height,self.img_width,3))
+        boxes,labels,scores = self.detector.detect(image_numpy)
+        msg = Detections_3d()
+        msg.header =  std_msgs.msg.Header()
+        msg.header.stamp = rospy.Time.now()
+        
+        centers = np.array([[int((b[0]+b[2])/2),int((b[1]+b[3])/2)] for b in boxes])
+        zs = [depth_img[i,j] for i,j in zip(centers[:,1],centers[:,0])]
+        points2d_z = np.array([[cx*z,cy*z,z]for cx,cy,z in zip(centers[:,0],centers[:,1],zs)])
+        points3d = np.dot(self.inv_k,points2d_z.T)
+        objs = [self.create_obj3d(x_3d,y_3d,z_3d) for x_3d,y_3d,z_3d in zip(points3d[0,:],points3d[1,:],points3d[2,:]) ]
+        msg.objects = objs
+        
+        self.pub.publish(msg)
+    def callback_debug(self,rgb,depth,info):
+        import time
+        
+        #start = time.time()
+        image_numpy = np.frombuffer(rgb.data,np.uint8)
+        depth_img = np.frombuffer(depth.data, dtype=np.uint16).reshape((self.img_height,self.img_width))*self.realsense_depth_scale
         #print('data reading time is %.4f'%(time.time()-start))
-        image_numpy = image_numpy.reshape((720,1280,3))
+        image_numpy = image_numpy.reshape((self.img_height,self.img_width,3))
         image_numpy = cv2.cvtColor(image_numpy,cv2.COLOR_RGB2BGR)
         
         k = np.array(list(info.K)).reshape(3,3)
         inv_k = np.linalg.pinv(k)
         
         boxes,labels,scores = self.detector.detect(image_numpy)
-        #print('up to detection time %.4f'%(time.time()-start))
+        # #print('up to detection time %.4f'%(time.time()-start))
         msg = Detections_3d()
         msg.header =  std_msgs.msg.Header()
         msg.header.stamp = rospy.Time.now()
@@ -66,7 +105,7 @@ class Detector:
         for box,label in zip(boxes,labels):
             
             xmin,ymin,xmax,ymax =[int(b) for b in box]
-            #cv2.rectangle(image_numpy,(xmin,ymin),(xmax,ymax),[255,255,0],2)
+            cv2.rectangle(image_numpy,(xmin,ymin),(xmax,ymax),[255,255,0],2)
             center_x = int((xmin+xmax)/2)
             center_y = int((ymin+ymax)/2)
             z = depth_img[center_y,center_x]
@@ -75,8 +114,10 @@ class Detector:
             point2d_z = np.array([center_x*z,center_y*z,z])
             point_3d= np.dot(inv_k,point2d_z)
             
-            #cv2.putText(image_numpy, '%.2fm'%(point_3d[2]),(xmin+20,ymin+20),cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
+            cv2.putText(image_numpy, '%s'%(self.names[label]),(xmin+20,ymin+20),cv2.FONT_HERSHEY_SIMPLEX, .5, [0,0,255],2)
+            cv2.putText(image_numpy, '%.2fm'%(point_3d[2]),(xmin+20,ymin+40),cv2.FONT_HERSHEY_SIMPLEX, .5, [0,0,255],2)
             obj = Object_3d()
+            
             obj.pos_x = point_3d[0]
             obj.pos_y = point_3d[1]
             obj.pos_z = point_3d[2]
@@ -85,9 +126,10 @@ class Detector:
         msg.objects = objs
         self.pub.publish(msg)
         #print('total time is %.4f'%(time.time()-start))
-        # cv2.namedWindow('feed', cv2.WINDOW_AUTOSIZE)
-        # cv2.imshow('feed', image_numpy)
-        ## cv2.waitKey(1)
+        if(self.counter%12==0):
+            cv2.imwrite('/home/maia/debug_img/frame_%s.png'%(str(self.counter).zfill(2)),image_numpy)
+        self.counter+=1
+        self.counter = self.counter %120
 
 
 if __name__ == '__main__':
