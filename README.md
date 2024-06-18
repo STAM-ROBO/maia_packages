@@ -57,7 +57,10 @@ export ROS_MASTER_URI=http://192.168.100.80:11311
 ### Object Detection Module
 
 This module is responsible for detecting objects from the camera feed, and perform 3D localization (using camera intrinsics and depth maps).
+
 The detection is performed in 2D using a COCO-trained detector. the system currently provides wrappers for YOLOv7 is cloned from the official reposistory (published in CVPR2023) and available either using Pytorch or TensorRT (accelerated)
+
+
 For installation: download and install pytorch (with cuda support) and see requirements.txt for other dependencies
 The detector node subscribes to a camera ROS node which publishes raw rgb, depth and intrinsics topics. 
 
