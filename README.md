@@ -55,9 +55,9 @@ export ROS_MASTER_URI=http://192.168.100.80:11311
 ```
 
 ## Launching the camera node
-To start the camera node, run the following command:
+To start the camera node and the object detector, launch the following command:
 ```
-roslaunch realsense2_camera rs_camera.launch align_depth:=true
+roslaunch object_detector run_detector.launch debug:=[true/false]
 ```
 This node publishes several topics obtained from the live-stream of the camera (besides others including the calibration parameters), to which we need to subscribe in other modules.
 
