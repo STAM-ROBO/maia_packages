@@ -17,7 +17,7 @@ from torchvision.transforms.functional import to_pil_image
 from yolov7_backend.yolo7_trt import YOLO7_TRT
 import message_filters
 from cv_bridge import CvBridge, CvBridgeError
-from object_detector.msg import Detections_3d,Object_3d
+from msg_common.msg import Detections_3d,Object_3d
 import std_msgs
 import time
 class Detector:
