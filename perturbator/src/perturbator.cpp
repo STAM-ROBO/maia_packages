@@ -1,63 +1,80 @@
 #include "ros/ros.h"
-#include<geometry_msgs/Twist.h>
-#include<math.h>
-#include<algorithm>
+#include <geometry_msgs/Twist.h>
+#include <math.h>
+#include <algorithm>
 #include <ros/console.h>
 
 ros::Publisher twist_pub;
 
-float p_xlv=0, p_zrv=0;
-double pert_cb_last_call_secs=0;
+float pert_xlv = 0, pert_zrv = 0;
+float cmd_xlv = 0, cmd_zrv = 0;
+double pert_cb_last_call_secs = 0;
+double cmd_cb_last_call_secs = 0;
 
-#define MAX_TX_VEL 0.5
-#define MAX_RZ_VEL 0.5
+#define MAX_TX_VEL 1.0f
+#define MAX_RZ_VEL 1.0f
 
-void pert_callback(const geometry_msgs::Twist& msg)
+float joy_mapping(float x, float f3, float f1)
 {
-	p_xlv = std::min(MAX_TX_VEL, std::max(-MAX_TX_VEL, msg.linear.x));
-	p_zrv = std::min(MAX_RZ_VEL, std::max(-MAX_RZ_VEL, msg.angular.z));
-	pert_cb_last_call_secs=ros::Time::now().toSec();
+	return f3 * x * x * x + f1 * x;
 }
 
-void vel_callback(const geometry_msgs::Twist& msg)
+void pert_callback(const geometry_msgs::Twist &msg)
 {
-	float xlv = msg.linear.x;
-	float zrv = msg.angular.z;
-	double time_now=ros::Time::now().toSec();
-	
-	/*
-	inject the perturbation here
-	TODO
-	*/
-	if(pert_cb_last_call_secs-time_now>1.0)
-	{
-		xlv += p_xlv;
-		zrv += p_zrv;
-	}
-	else
-	{
-		ROS_INFO_THROTTLE(1, "pert_vel data not updated in the last 1.0 seconds. Suspending correction.");
-	}
-	
-	geometry_msgs::Twist out_twist;
-	out_twist.linear.x=xlv;
-	out_twist.angular.z=zrv;
-	twist_pub.publish(out_twist);
+	pert_cb_last_call_secs = ros::Time::now().toSec();
+	pert_xlv = joy_mapping(msg.linear.x, 0.9, 0.2);
+	pert_zrv = joy_mapping(-msg.linear.y, 0.5, 0.5);
 }
- 
+
+void vel_callback(const geometry_msgs::Twist &msg)
+{
+	cmd_cb_last_call_secs = ros::Time::now().toSec();
+	cmd_xlv = msg.linear.x*1.0;
+	cmd_zrv = msg.angular.z*1.0;
+}
+
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "perturb_node");
 	ros::NodeHandle n;
 
-	//publish perturbated values to topic cmd_vel_pert
+	// publish perturbated values to topic cmd_vel_pert
 	twist_pub = n.advertise<geometry_msgs::Twist>("cmd_vel_pert", 10);
-	
-	//subscribe to cmd_vel
+
+	// subscribe to cmd_vel
 	ros::Subscriber sub = n.subscribe("cmd_vel", 10, vel_callback);
-	ros::Subscriber sub2 = n.subscribe("pert_vel", 10, pert_callback);
-	
-	ROS_INFO("perturb_node started");
-	ros::spin();
+	ros::Subscriber sub2 = n.subscribe("spacenav/twist", 10, pert_callback);
+	ros::Rate loop_rate(30);
+
+	double time_now = 0;
+
+	ROS_INFO("*********** perturb_node started");
+	while (ros::ok())
+	{
+		time_now = ros::Time::now().toSec();
+
+		if (time_now - cmd_cb_last_call_secs > 0.5)
+		{
+			cmd_xlv = 0;
+			cmd_zrv = 0;
+			ROS_INFO_THROTTLE(5, "*********** cmd_vel data idle");
+		}
+
+		if (time_now - pert_cb_last_call_secs > 0.5)
+		{
+			pert_xlv = 0;
+			pert_zrv = 0;
+			ROS_INFO_THROTTLE(5, "*********** perturbation data idle");
+		}
+
+		geometry_msgs::Twist out_twist;
+		out_twist.linear.x = cmd_xlv + pert_xlv;
+		out_twist.angular.z = cmd_zrv + pert_zrv;
+		twist_pub.publish(out_twist);
+
+		ros::spinOnce();
+		loop_rate.sleep();
+	}
+
 	return 0;
 }

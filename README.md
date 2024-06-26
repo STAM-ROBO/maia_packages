@@ -16,7 +16,7 @@ git clone https://github.com/STAM-ROBO/maia_packages src
 You need to install these pkgs before building MAIA
 ```
 sudo apt-get update
-sudo apt-get install -y python3-catkin-tools ros-noetic-tf2-sensor-msgs ros-noetic-tf ros-noetic-image-transport ros-noetic-realsense2-camera ros-noetic-angles ros-noetic-laser-geometry libsdl-image1.2-dev libsdl-dev libbullet-dev ros-noetic-tf2-geometry-msgs qt5-default libyaml-cpp-dev
+sudo apt-get install -y python3-catkin-tools ros-noetic-tf2-sensor-msgs ros-noetic-tf ros-noetic-image-transport ros-noetic-realsense2-camera ros-noetic-angles ros-noetic-laser-geometry libsdl-image1.2-dev libsdl-dev libbullet-dev ros-noetic-tf2-geometry-msgs qt5-default libyaml-cpp-dev ros-noetic-laser-filters
 ```
 
 The YDlidar-SDK is needed and may be installed in any folder.
@@ -53,6 +53,10 @@ On the remote control PC (192.168.100.150):
 export ROS_IP=192.168.100.150
 export ROS_MASTER_URI=http://192.168.100.80:11311
 ```
+
+
+### Network settings
+sudo nano /etc/network/interfaces
 
 ### Object Detection Module
 
