@@ -2,7 +2,7 @@
 #set IP ADDRESS of this machine
 
 sudo chmod a+rw /dev/ttyUSB0
-sudo chmod a+rw /dev/ttyACM0
+sudo chmod a+rw /dev/ttyUSB1
 export ROS_IP=192.168.100.207
 
 #set IP ADDRESS of roscore

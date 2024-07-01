@@ -21,16 +21,17 @@ float joy_mapping(float x, float f3, float f1)
 
 void pert_callback(const geometry_msgs::Twist &msg)
 {
+	float alpha=0.1;
 	pert_cb_last_call_secs = ros::Time::now().toSec();
-	pert_xlv = joy_mapping(msg.linear.x, 0.9, 0.2);
-	pert_zrv = joy_mapping(-msg.linear.y, 0.5, 0.5);
+	pert_xlv = (alpha) * joy_mapping(msg.linear.x, 0.9, 0.1) + (1-alpha) * pert_xlv;
+	pert_zrv = (alpha) * joy_mapping(msg.linear.y, 0.9, 0.1) + (1-alpha) * pert_zrv;
 }
 
 void vel_callback(const geometry_msgs::Twist &msg)
 {
 	cmd_cb_last_call_secs = ros::Time::now().toSec();
-	cmd_xlv = msg.linear.x*1.0;
-	cmd_zrv = msg.angular.z*1.0;
+	cmd_xlv = msg.linear.x;
+	cmd_zrv = msg.angular.z;
 }
 
 int main(int argc, char **argv)
@@ -68,8 +69,8 @@ int main(int argc, char **argv)
 		}
 
 		geometry_msgs::Twist out_twist;
-		out_twist.linear.x = cmd_xlv + pert_xlv;
-		out_twist.angular.z = cmd_zrv + pert_zrv;
+		out_twist.linear.x = cmd_xlv + pert_xlv*0.2;
+		out_twist.angular.z = cmd_zrv + pert_zrv*0.5;
 		twist_pub.publish(out_twist);
 
 		ros::spinOnce();
