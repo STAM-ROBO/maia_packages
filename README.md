@@ -16,7 +16,7 @@ git clone https://github.com/STAM-ROBO/maia_packages src
 You need to install these pkgs before building MAIA
 ```
 sudo apt-get update
-sudo apt-get install -y python3-catkin-tools ros-noetic-tf2-sensor-msgs ros-noetic-tf ros-noetic-image-transport ros-noetic-realsense2-camera ros-noetic-angles ros-noetic-laser-geometry libsdl-image1.2-dev libsdl-dev libbullet-dev ros-noetic-tf2-geometry-msgs qt5-default libyaml-cpp-dev ros-noetic-laser-filters
+sudo apt-get install -y python3-catkin-tools ros-noetic-tf2-sensor-msgs ros-noetic-tf ros-noetic-image-transport ros-noetic-realsense2-camera ros-noetic-angles ros-noetic-laser-geometry libsdl-image1.2-dev libsdl-dev libbullet-dev ros-noetic-tf2-geometry-msgs qt5-default libyaml-cpp-dev ros-noetic-laser-filters ros-noetic-cv-camera ros-noetic-camera-calibration
 ```
 
 The YDlidar-SDK is needed and may be installed in any folder.
