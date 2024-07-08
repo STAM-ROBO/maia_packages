@@ -20,9 +20,9 @@
 	</node>
 	
 	
-	<node pkg="image_view" type="image_view" name="image_view" output="screen">	
+	<!--node pkg="image_view" type="image_view" name="image_view" output="screen">	
 		<param name="autosize" type="bool" value="true"/> 
 		<param name="window_name" type="string" value="Aruco detection"/> 
-	</node>
+	</node-->
 </launch>
 

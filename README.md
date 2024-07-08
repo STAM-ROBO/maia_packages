@@ -10,24 +10,17 @@ cd
 mkdir maia_ws
 cd maia_ws
 git clone https://github.com/STAM-ROBO/maia_packages src
+
+
 ```
 
 ## Dependencies
 You need to install these pkgs before building MAIA
 ```
 sudo apt-get update
-sudo apt-get install -y python3-catkin-tools ros-noetic-tf2-sensor-msgs ros-noetic-tf ros-noetic-image-transport ros-noetic-realsense2-camera ros-noetic-angles ros-noetic-laser-geometry libsdl-image1.2-dev libsdl-dev libbullet-dev ros-noetic-tf2-geometry-msgs qt5-default libyaml-cpp-dev ros-noetic-laser-filters
-```
-
-The YDlidar-SDK is needed and may be installed in any folder.
-```
-cd
-git clone https://github.com/YDLIDAR/YDLidar-SDK.git
-mkdir -p ~/YDLidar-SDK/build
-cd YDLidar-SDK/build
-cmake ..
-make
-sudo make install
+sudo apt-get install -y python3-catkin-tools ros-noetic-realsense2-camera libsdl-image1.2-dev libsdl-dev libbullet-dev ros-noetic-tf2-geometry-msgs qt5-default libyaml-cpp-dev ros-noetic-laser-filters ros-noetic-cv-camera ros-noetic-camera-calibration
+wget -O torch-2.0.0a0+8aa34602.nv23.03-cp38-cp38-linux_aarch64.whl https://developer.download.nvidia.com/compute/redist/jp/v51/pytorch/torch-2.0.0a0+8aa34602.nv23.03-cp38-cp38-linux_aarch64.whl
+pip install torch-2.0.0a0+8aa34602.nv23.03-cp38-cp38-linux_aarch64.whl pyserial
 ```
 
 ## Build MAIA

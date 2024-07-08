@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 #set IP ADDRESS of this machine
 
-sudo chmod a+rw /dev/ttyUSB0
-sudo chmod a+rw /dev/ttyUSB1
+#trigger udev rule tu assign usb devisec names
+sudo udevadm trigger
+
+#get rw permission
+sudo chmod a+rw /dev/usb_lidar
+sudo chmod a+rw /dev/usb_motors
 export ROS_IP=192.168.100.207
 
 #set IP ADDRESS of roscore
