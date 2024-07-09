@@ -1,4 +1,2 @@
-float32 pos_x
-float32 pos_y
-float32 pos_z
 string obj_class
+geometry_msgs/Point pt

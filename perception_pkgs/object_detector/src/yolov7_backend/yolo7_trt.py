@@ -16,7 +16,7 @@ class YOLO7_TRT:
     def __init__(self):
         print(torch.cuda.is_available())
         self.device = torch.device('cuda')
-        model_weights = '/home/maia/maia_ws/src/perception_pkgs/object_detector/src/yolov7_backend/yolov7-jp.trt'
+        model_weights = '/home/maia/maia_ws/src/perception_pkgs/object_detector/src/yolov7_backend/yolov7.trt'
         Binding = namedtuple('Binding', ('name', 'dtype', 'shape', 'data', 'ptr'))
         logger = trt.Logger(trt.Logger.ERROR)
         trt.init_libnvinfer_plugins(logger, namespace="")
