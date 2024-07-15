@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 	ros::NodeHandle n;
 
 	// publish perturbated values to topic cmd_vel_pert
-	twist_pub = n.advertise<geometry_msgs::Twist>("cmd_vel_pert", 10);
+	twist_pub = n.advertise<geometry_msgs::Twist>("motor_vel", 10);
 
 	// subscribe to cmd_vel
 	ros::Subscriber sub = n.subscribe("cmd_vel", 10, vel_callback);
@@ -69,8 +69,8 @@ int main(int argc, char **argv)
 		}
 
 		geometry_msgs::Twist out_twist;
-		out_twist.linear.x = cmd_xlv + pert_xlv*0.2;
-		out_twist.angular.z = cmd_zrv + pert_zrv*0.5;
+		out_twist.linear.x = cmd_xlv + pert_xlv;
+		out_twist.angular.z = cmd_zrv + pert_zrv;
 		twist_pub.publish(out_twist);
 
 		ros::spinOnce();

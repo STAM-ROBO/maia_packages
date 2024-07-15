@@ -89,21 +89,21 @@ TrajectoryPlannerROS:
   prune_plan: false
 
 DWAPlannerROS:
-  max_vel_trans: 0.3
+  max_vel_trans: 0.2
   min_vel_trans: 0.0
   max_vel_x: 0.2
   min_vel_x: 0
   max_vel_y: 0.0
   min_vel_y: 0.0
-  max_vel_theta: 0.3
+  max_vel_theta: 0.2
   min_vel_theta: 0.0
   acc_lim_x: 3
   acc_lim_y: 0
   acc_lim_theta: 3
 
   # Goal Tolerance Parametes
-  yaw_goal_tolerance: 0.2
-  xy_goal_tolerance: 0.1 
+  yaw_goal_tolerance: 1
+  xy_goal_tolerance: 0.4 
   latch_xy_goal_tolerance: true
 
   # Forward Simulation Parameters
@@ -135,10 +135,10 @@ recovery_behaviors:
     type: "clear_costmap_recovery/ClearCostmapRecovery"
 
 super_conservative_reset:
-  reset_distance: 3.0
+  reset_distance: 2.5
 
 conservative_reset:
   reset_distance: 2.0
 
 aggressive_reset:
-  reset_distance: 1.5
+  reset_distance: 1

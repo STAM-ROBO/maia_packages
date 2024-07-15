@@ -6,6 +6,9 @@ sudo udevadm trigger
 #get permissions for ttys
 sudo chmod a+rw /dev/usb_lidar
 sudo chmod a+rw /dev/usb_motors
+#sudo chmod a+rw /dev/ttyUSB0
+#sudo chmod a+rw /dev/ttyUSB1
+
 
 #again, set the IP address of roscore
 export ROS_IP=192.168.100.207

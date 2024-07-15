@@ -1,28 +1,54 @@
 <?xml version="1.0"?>
 <launch>
-	<remap from="/camera/image_raw" to="/camera"/>
-	<remap from="/fiducial_images" to="/image"/>
+	
+																						<!-- euler rZ rY rX-->
+	<node pkg="tf" type="static_transform_publisher" name="base_to_camera" args="0 0 1.5 1.57 3.14 0.349 /base_link /aruco_camera 20" />
 
-	<node pkg="usb_cam" type="usb_cam_node" name="camera" output="screen">
-		<param name="camera_frame_id" type="string" value="overhead_camera"/>  
+	<group ns="od_ns">
+		<include file="$(find realsense2_camera)/launch/rs_camera.launch">
+			<arg name="align_depth" value="false"/>
+			<arg name="color_width" value="640"/>
+			<arg name="depth_width" value="640"/>
+			<arg name="color_height" value="480"/>
+			<arg name="depth_height" value="480"/>
+			<arg name="color_fps" value="30"/>
+			<arg name="depth_fps" value="30"/>
+			<arg name="output" value="log"/>
+		</include>
+	</group>
+
+	<!--node pkg="cv_camera" type="cv_camera_node" name="aruco_camera" output="screen">
+		<remap from="/aruco_camera/image_raw" to="/aruco_camera"/>
+		<param name="frame_id" type="string" value="aruco_camera"/>  
+		<param name="rate" type="int" value="20"/>  
+		<param name="image_width" type="int" value="640"/>  
+		<param name="image_height" type="int" value="480"/>  
+		<param name="device_id" value="6" />
+		<param name="camera_info_url" type="string" value="file://$(find maia_powerchair)/params/camera.yaml"/>  	
+	</node-->
+
+	<node pkg="usb_cam" type="usb_cam_node" name="aruco_camera" output="screen">
+		<remap from="/aruco_camera/image_raw" to="/aruco_camera"/>
+		<param name="camera_frame_id" type="string" value="aruco_camera"/>  
 		<param name="framerate" type="int" value="30"/>  
 		<param name="image_width" type="int" value="640"/>  
 		<param name="image_height" type="int" value="480"/>  
-		<param name="video_device" type="string" value="/dev/video0"/>  
+		<param name="video_device" type="string" value="/dev/video7"/>  
 		<param name="pixel_format" type="string" value="yuyv"/> 
 		<param name="camera_info_url" type="string" value="file://$(find maia_powerchair)/params/camera.yaml"/>  	
 	</node>
 	
-	<node pkg="aruco_detect" type="aruco_detect" name="aruco_detector" output="screen">	
+	<!--node pkg="aruco_detect" type="aruco_detect" name="aruco_detector">
+		<remap from="/camera" to="/aruco_camera"/>
 		<param name="publish_images" type="bool" value="true"/>  
-		<param name="dictionary" type="int" value="7"/> <!-- use ARUCO 5X5 https://chev.me/arucogen/ --> 
-		<param name="fiducial_len" type="double" value="0.036"/>  <!-- set printed marker side length in meters-->		
-	</node>
-	
-	
-	<!--node pkg="image_view" type="image_view" name="image_view" output="screen">	
-		<param name="autosize" type="bool" value="true"/> 
-		<param name="window_name" type="string" value="Aruco detection"/> 
+		<param name="dictionary" type="int" value="7"/>  
+		<param name="fiducial_len" type="double" value="0.05"/>  		
+		<param name="minMarkerDistanceRate" type="double" value="0.05"/>  		
+		<param name="minMarkerPerimeterRate" type="double" value="0.03"/>  		
 	</node-->
+
+	<!--node name="detector" pkg="object_detector" type="show_feed.py" output="log">
+	</node-->
+
 </launch>
 
