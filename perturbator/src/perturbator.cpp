@@ -3,6 +3,21 @@
 #include <math.h>
 #include <algorithm>
 #include <ros/console.h>
+#include <string>
+
+/*
+Perturbation node
+Subscribes to:
+- cmd_vel motor velocities from navigation controller
+- [perturb_twist_name] topic providing the perturbatin velocities
+
+Publishes the result of the sum
+
+	cmd_vel + [perturb_twist_name]
+
+to topic [ouput_topic] at a rate of 30Hz
+
+*/
 
 ros::Publisher twist_pub;
 
@@ -37,45 +52,67 @@ void vel_callback(const geometry_msgs::Twist &msg)
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "perturb_node");
-	ros::NodeHandle n;
+	ros::NodeHandle nh("~");
+	int isready=0;
+	std::string perturb_topic_name;
+	std::string output_topic_name;
 
-	// publish perturbated values to topic cmd_vel_pert
-	twist_pub = n.advertise<geometry_msgs::Twist>("motor_vel", 10);
-
-	// subscribe to cmd_vel
-	ros::Subscriber sub = n.subscribe("cmd_vel", 10, vel_callback);
-	ros::Subscriber sub2 = n.subscribe("spacenav/twist", 10, pert_callback);
-	ros::Rate loop_rate(30);
-
-	double time_now = 0;
-
-	ROS_INFO("*********** perturb_node started");
-	while (ros::ok())
+	if (nh.getParam("perturb_topic", perturb_topic_name)) 
 	{
-		time_now = ros::Time::now().toSec();
-
-		if (time_now - cmd_cb_last_call_secs > 0.5)
-		{
-			cmd_xlv = 0;
-			cmd_zrv = 0;
-			ROS_INFO_THROTTLE(5, "*********** cmd_vel data idle");
-		}
-
-		if (time_now - pert_cb_last_call_secs > 0.5)
-		{
-			pert_xlv = 0;
-			pert_zrv = 0;
-			ROS_INFO_THROTTLE(5, "*********** perturbation data idle");
-		}
-
-		geometry_msgs::Twist out_twist;
-		out_twist.linear.x = cmd_xlv + pert_xlv;
-		out_twist.angular.z = cmd_zrv + pert_zrv;
-		twist_pub.publish(out_twist);
-
-		ros::spinOnce();
-		loop_rate.sleep();
+		ros::Subscriber sub2 = nh.subscribe(perturb_topic_name, 10, pert_callback);
+		ROS_INFO("Subscribed to perturbation topic: %s", perturb_topic_name.c_str());
+		isready++;
 	}
 
-	return 0;
+	if (nh.getParam("output_topic", output_topic_name)) 
+	{
+		twist_pub = nh.advertise<geometry_msgs::Twist>(output_topic_name, 10);
+		ROS_INFO("Subscribed to output topic: %s", output_topic_name.c_str());
+		isready++;
+	}
+
+	if(isready == 2)
+	{
+		// subscribe to cmd_vel
+		ROS_INFO("PERTURBATOR READY");
+		ros::Subscriber sub = nh.subscribe("cmd_vel", 10, vel_callback);
+	}
+	else
+	{
+		ROS_INFO("PERTURBATOR PARAM ERROR");
+	}
+	
+	if(isready == 2)
+	{
+		ros::Rate loop_rate(30);
+		double time_now = 0;
+		ROS_INFO("*********** perturb_node started");
+		while (ros::ok())
+		{
+			time_now = ros::Time::now().toSec();
+
+			if (time_now - cmd_cb_last_call_secs > 0.5)
+			{
+				cmd_xlv = 0;
+				cmd_zrv = 0;
+				ROS_INFO_THROTTLE(10, "*********** cmd_vel data idle");
+			}
+
+			if (time_now - pert_cb_last_call_secs > 0.5)
+			{
+				pert_xlv = 0;
+				pert_zrv = 0;
+				ROS_INFO_THROTTLE(10, "*********** perturbation data idle");
+			}
+
+			geometry_msgs::Twist out_twist;
+			out_twist.linear.x = cmd_xlv + pert_xlv;
+			out_twist.angular.z = cmd_zrv + pert_zrv;
+			twist_pub.publish(out_twist);
+
+			ros::spinOnce();
+			loop_rate.sleep();
+		}
+	}
+	else return 0;
 }

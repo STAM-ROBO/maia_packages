@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+
+	<group ns="od_ns">
+		<include file="$(find realsense2_camera)/launch/rs_camera.launch">
+			<arg name="align_depth" value="false"/>
+			<arg name="color_width" value="640"/>
+			<arg name="depth_width" value="640"/>
+			<arg name="color_height" value="480"/>
+			<arg name="depth_height" value="480"/>
+			<arg name="color_fps" value="30"/>
+			<arg name="depth_fps" value="30"/>
+			<arg name="output" value="log"/>
+		</include>
+	</group>
+
+	<node name="detector" pkg="object_detector" type="show_feed.py" output="screen">
+	</node>
+
+</launch>
+
