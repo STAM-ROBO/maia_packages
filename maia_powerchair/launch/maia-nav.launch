@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-	<!--node pkg="spacenav_node" type="spacenav_node" name="spacenav_node"/-->
+	<node pkg="spacenav_node" type="spacenav_node" name="spacenav_node"/>
 
 	<node pkg="usb_cam" type="usb_cam_node" name="aruco_camera" output="screen">
 		<remap from="/aruco_camera/image_raw" to="/aruco_camera"/>
@@ -45,11 +45,6 @@
 		<param name="baud" value="115200"/>
 	</node>
 	
-	<node pkg="perturbator" type="perturbator" name="perturbator" output="screen">
-		<param name="perturb_topic" type="string" value="spacenav/twist" />
-		<param name="output_topic" type="string" value="motor_cmd" />
-	</node>
-
 	<node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
 		<!-- Frame names -->
 		<!--remap from="scanmatch_odom" to="odometry"/-->
@@ -95,5 +90,8 @@
 		<rosparam file="$(find maia_powerchair)/params/costmap_params.yaml" command="load"/> 
 		<rosparam file="$(find maia_powerchair)/params/planners_params.yaml" command="load"/>
 	</node>
+
+	<node pkg="perturbator" type="perturbator" name="perturbator" output="screen"/>
+
 </launch>
 

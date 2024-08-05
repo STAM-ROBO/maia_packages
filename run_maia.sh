@@ -11,10 +11,10 @@ sudo chmod a+rw /dev/usb_motors
 
 
 #again, set the IP address of roscore
-export ROS_IP=192.168.100.207
+export ROS_IP=172.17.24.54
 
 #set IP address of roscore
-export ROS_MASTER_URI=http://192.168.100.207:11311
+export ROS_MASTER_URI=http://172.17.24.54:11311
 
 cd 
 cd maia_ws

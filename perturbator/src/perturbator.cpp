@@ -20,6 +20,7 @@ to topic [ouput_topic] at a rate of 30Hz
 */
 
 ros::Publisher twist_pub;
+ros::Subscriber pert_sub, cmd_vel_sub; 
 
 float pert_xlv = 0, pert_zrv = 0;
 float cmd_xlv = 0, cmd_zrv = 0;
@@ -40,6 +41,7 @@ void pert_callback(const geometry_msgs::Twist &msg)
 	pert_cb_last_call_secs = ros::Time::now().toSec();
 	pert_xlv = (alpha) * joy_mapping(msg.linear.x, 0.9, 0.1) + (1-alpha) * pert_xlv;
 	pert_zrv = (alpha) * joy_mapping(msg.linear.y, 0.9, 0.1) + (1-alpha) * pert_zrv;
+	//ROS_INFO_THROTTLE(5, "pert_callback time called: %f", pert_cb_last_call_secs);
 }
 
 void vel_callback(const geometry_msgs::Twist &msg)
@@ -47,19 +49,29 @@ void vel_callback(const geometry_msgs::Twist &msg)
 	cmd_cb_last_call_secs = ros::Time::now().toSec();
 	cmd_xlv = msg.linear.x;
 	cmd_zrv = msg.angular.z;
+	//ROS_INFO_THROTTLE(5, "vel_callback time called: %f", cmd_cb_last_call_secs);
 }
 
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "perturb_node");
-	ros::NodeHandle nh("~");
+	ros::NodeHandle nh;
 	int isready=0;
 	std::string perturb_topic_name;
 	std::string output_topic_name;
 
-	if (nh.getParam("perturb_topic", perturb_topic_name)) 
+
+
+	pert_sub = nh.subscribe("spacenav/twist", 10, pert_callback);
+	cmd_vel_sub = nh.subscribe("cmd_vel", 10, vel_callback);
+	twist_pub = nh.advertise<geometry_msgs::Twist>("motor_vel", 10);
+	isready=2;
+		
+	/*if (nh.getParam("perturb_topic", perturb_topic_name)) 
 	{
-		ros::Subscriber sub2 = nh.subscribe(perturb_topic_name, 10, pert_callback);
+		//ros::Subscriber pert_sub = nh.subscribe("spacenav/twist", 10, pert_callback);
+		ros::Subscriber pert_sub = nh.subscribe(perturb_topic_name, 10, pert_callback);
+		
 		ROS_INFO("Subscribed to perturbation topic: %s", perturb_topic_name.c_str());
 		isready++;
 	}
@@ -67,7 +79,7 @@ int main(int argc, char **argv)
 	if (nh.getParam("output_topic", output_topic_name)) 
 	{
 		twist_pub = nh.advertise<geometry_msgs::Twist>(output_topic_name, 10);
-		ROS_INFO("Subscribed to output topic: %s", output_topic_name.c_str());
+		ROS_INFO("Publishing to output topic: %s", output_topic_name.c_str());
 		isready++;
 	}
 
@@ -81,6 +93,7 @@ int main(int argc, char **argv)
 	{
 		ROS_INFO("PERTURBATOR PARAM ERROR");
 	}
+	*/
 	
 	if(isready == 2)
 	{
