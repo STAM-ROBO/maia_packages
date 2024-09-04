@@ -60,8 +60,6 @@ int main(int argc, char **argv)
 	std::string perturb_topic_name;
 	std::string output_topic_name;
 
-
-
 	pert_sub = nh.subscribe("spacenav/twist", 10, pert_callback);
 	cmd_vel_sub = nh.subscribe("cmd_vel", 10, vel_callback);
 	twist_pub = nh.advertise<geometry_msgs::Twist>("motor_vel", 10);
