@@ -96,6 +96,8 @@
 		<rosparam file="$(find maia_powerchair)/params/costmap_common_params.yaml" command="load" ns="global_costmap"/>
 		<rosparam file="$(find maia_powerchair)/params/costmap_common_params.yaml" command="load" ns="local_costmap"/>
 		<rosparam file="$(find maia_powerchair)/params/costmap_params.yaml" command="load"/> 
+		<!--rosparam file="$(find maia_powerchair)/params/local_costmap_params.yaml" command="load"/> 
+		<rosparam file="$(find maia_powerchair)/params/global_costmap_params.yaml" command="load"/--> 
 		<rosparam file="$(find maia_powerchair)/params/planners_params.yaml" command="load"/>
 	</node>
 
