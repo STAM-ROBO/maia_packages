@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>tcp_link_angle</name>
+  <version>0.0.0</version>
+  <description>The TCPLink package_angle</description>
+
+  <maintainer email="jehyung.jung@tecnalia.com">Je Hyung Jung</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>rospy</exec_depend>
+  
+  <depend>geometry_msgs</depend>
+
+  <export>
+  </export>
+</package>

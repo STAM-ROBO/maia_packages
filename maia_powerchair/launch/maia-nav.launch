@@ -1,6 +1,14 @@
 <?xml version="1.0"?>
 <launch>
-	<node pkg="spacenav_node" type="spacenav_node" name="spacenav_node"/>
+	<!--node pkg="spacenav_node" type="spacenav_node" name="spacenav_node"/-->
+
+ <node pkg="spacenav_node" type="spacenav_node" name="spacenav">
+    <param name="zero_when_static" value="true"/>
+    <param name="static_count_threshold" value="30"/>
+    <rosparam param="linear_scale">[0.3, 0.3, 0.3]</rosparam>
+    <rosparam param="angular_scale">[0.3, 0.3, 0.3]</rosparam>
+  </node> 
+ 
 
 	<node pkg="usb_cam" type="usb_cam_node" name="aruco_camera" output="screen">
 		<remap from="/aruco_camera/image_raw" to="/aruco_camera"/>
@@ -60,7 +68,7 @@
 		<param name="pub_odometry" value="true" />
 
 		<!-- Map size / start point -->
-		<param name="map_resolution" value="0.03"/>
+		<param name="map_resolution" value="0.05"/>
 		<param name="map_size" value="1024"/>
 		<param name="map_start_x" value="0.5"/>
 		<param name="map_start_y" value="0.5" />
@@ -70,12 +78,12 @@
 		<param name="update_factor_free" value="0.2"/>
 		<param name="update_factor_occupied" value="0.9" />
 		<param name="map_update_distance_thresh" value="0.1"/>
-		<param name="map_update_angle_thresh" value="0.9" />
+		<param name="map_update_angle_thresh" value="0.2" />
 		<param name="laser_z_min_value" value = "-1.0" />
 		<param name="laser_z_max_value" value = "1.0" />
-		<param name="map_pub_period " value = "0.5" />
+		<param name="map_pub_period " value = "0.2" />
 		<param name="laser_min_dist  " value = "1.5" />
-		<param name="laser_max_dist  " value = "10.0" />
+		<param name="laser_max_dist  " value = "12.0" />
 
 		<!-- Advertising config -->
 		<param name="advertise_map_service" value="true"/>
