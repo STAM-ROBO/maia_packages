@@ -40,7 +40,7 @@
 	<node pkg="tf" type="static_transform_publisher" name="base_to_laser" args="0.78 0.47 0.0 0 0.0 0.0 /base_link /laser_link 20" />
 
 	<node name="rplidarNode"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
-		<param name="serial_port"         type="string" value="/dev/usb_lidar"/>
+		<param name="serial_port"         type="string" value="/dev/ttyUSB0"/>
 		<param name="serial_baudrate"     type="int"    value="115200"/>
 		<param name="frame_id"            type="string" value="laser_link"/>
 		<param name="inverted"            type="bool"   value="false"/>
@@ -49,7 +49,7 @@
 
 	<!-- communication with the motor controller -->
 	<node pkg="rosserial_python" type="serial_node.py" name="motor_bridge_node" output="screen">
-		<param name="port" value="/dev/usb_motors"/>
+		<param name="port" value="/dev/ttyACM0"/>
 		<param name="baud" value="115200"/>
 	</node>
 	
