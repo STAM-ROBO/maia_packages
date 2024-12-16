@@ -16,13 +16,19 @@ git clone https://github.com/STAM-ROBO/maia_packages src
 You need to install these pkgs before building MAIA
 ```
 sudo apt-get update
-sudo apt-get install -y python3-catkin-tools ros-noetic-realsense2-camera libsdl-image1.2-dev libsdl-dev libbullet-dev ros-noetic-tf2-geometry-msgs qt5-default libyaml-cpp-dev ros-noetic-laser-filters ros-noetic-cv-camera ros-noetic-camera-calibration
+sudo apt-get install -y nano spacenavd ros-noetic-spacenav-node python3-catkin-tools ros-noetic-realsense2-camera libsdl-image1.2-dev libsdl-dev libbullet-dev ros-noetic-tf2-geometry-msgs qt5-default libyaml-cpp-dev ros-noetic-laser-filters ros-noetic-cv-camera ros-noetic-camera-calibration
 wget -O torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl https://developer.download.nvidia.cn/compute/redist/jp/v512/pytorch/torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl
 pip install torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl pyserial
-
-
 wget https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7.pt
 ```
+
+## Install usb_camera (NVIDIA version is broken)
+sudo nano /etc/apt/sources.list.d/nvidia-l4t-apt-source.list
+->>>Comment the line - deb https://repo.download.nvidia.com/jetson/ffmpeg r36.3 main
+sudo add-apt-repository ppa:savoury1/ffmpeg4
+sudo apt-get update
+sudo apt remove ffmpeg
+sudo apt install ffmpeg
 
 ## Install and build torchvision
 ```
